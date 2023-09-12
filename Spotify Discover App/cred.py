@@ -1,0 +1,4 @@
+CLIENT_ID = "937f0dbf83da4cfc9495eff8013c64ae"
+CLIENT_SECRET = "914f7f9db006454ea0a4b877e09e58bb"
+
+REDIRECT_URL='http://127.0.0.1:5000/redirect'
