@@ -52,7 +52,7 @@ def main():
                                                    , scope=scope))
 
     # Replace with your chosen playlist name
-    chosen_playlist_name = "country"
+    chosen_playlist_name = input("Enter the name of your chosen playlist: ")
     discover_weekly_name = "Discover Weekly"
     new_playlist_name = "Sorted Discover Weekly"  # Choose a name for the new playlist
 
@@ -134,8 +134,9 @@ def main():
 
 if __name__ == "__main__":
     # Schedule the script to run every Monday at noon
-    schedule.every().monday.at("12:00").do(main)
+    # schedule.every().monday.at("12:00").do(main)
 
-    # Run the script continuously
-    while True:
-        time.sleep(1)
+    # # Run the script continuously
+    # while True:
+    #     time.sleep(1)
+    main()
