@@ -44,7 +44,7 @@ def add_tracks_to_playlist(sp, playlist_id, track_uris):
 
 def main():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=cred.CLIENT_ID
-                                                   , client_secret= cred.CLIENT_SECRET
+                                                   , client_secret=cred.CLIENT_SECRET
                                                    , redirect_uri=cred.REDIRECT_URL
                                                    , scope=scope))
 
@@ -72,6 +72,10 @@ def main():
         # Extract audio features for chosen playlist tracks
         chosen_playlist_track_ids = [track[0] for track in chosen_playlist_tracks]
         chosen_playlist_audio_features = get_audio_features(sp, chosen_playlist_track_ids)
+
+        # Get the previously added track IDs from the sorted playlist
+        sorted_playlist_tracks = get_tracks_from_playlist(sp, sorted_playlist_id)
+        previously_added_track_ids = [track[0] for track in sorted_playlist_tracks]
 
         # Create a DataFrame to store track names, artist names, and similarity scores
         track_data = []
@@ -106,7 +110,10 @@ def main():
                             , chosen_playlist_audio_features[0]['tempo']
                             , chosen_playlist_audio_features[0]['key']])  # Replace with chosen playlist track's features
                 )
-                track_data.append((dw_track_name, dw_track_artists, similarity, dw_track_id))  # Store track name, artist names, similarity score, and track ID
+
+                # Store track name, artist names, similarity score, and track ID if not previously added
+                if dw_track_id not in previously_added_track_ids:
+                    track_data.append((dw_track_name, dw_track_artists, similarity, dw_track_id))
 
         # Create a DataFrame from the track data
         df = pd.DataFrame(track_data, columns=['Track Name', 'Artist Names', 'Similarity Score', 'Track ID'])
@@ -118,7 +125,7 @@ def main():
         sorted_track_ids = df['Track ID'].tolist()
 
         # Clear the existing tracks in the sorted playlist
-        sp.playlist_remove_all_occurrences_of_items(sorted_playlist_id, sorted_track_ids)
+        sp.playlist_remove_all_occurrences_of_items(sorted_playlist_id, previously_added_track_ids)
 
         # Add the sorted tracks to the sorted playlist
         add_tracks_to_playlist(sp, sorted_playlist_id, sorted_track_ids)
@@ -139,7 +146,7 @@ def main():
     label.pack()
 
     # Create a dropdown list with a default value of "Country"
-    selected_playlist.set("Country")
+    selected_playlist.set("country")
     dropdown = ttk.Combobox(root, textvariable=selected_playlist, values=playlist_names)
     dropdown.pack()
 
@@ -158,6 +165,10 @@ def main():
     root.mainloop()
 
 if __name__ == "__main__":
+
+    # Uncomment this to run ad hoc
+    # main()
+
     # Schedule the script to run every Monday at noon
     schedule.every().monday.at("12:00").do(main)
 
